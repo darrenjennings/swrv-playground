@@ -1,19 +1,40 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    {{ data.results.map(p => p.name) }}
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from '@vue/composition-api'
+import useSwrv from 'swrv'
 import HelloWorld from './components/HelloWorld.vue'
 
-export default {
+interface ApiResponse {
+  results: Pokemon[]
+}
+
+interface Pokemon {
+  name: string,
+  url: string
+}
+
+export default defineComponent({
   name: 'App',
   components: {
     HelloWorld
+  },
+  setup () {
+    const { data } = useSwrv<ApiResponse>('key', () => {
+      return fetch('https://pokeapi.co/api/v2/pokemon')
+        .then(res => res.json())
+        .then(json => json)
+    })
+    
+    return {
+      data
+    }
   }
-}
+})
 </script>
 
 <style>
